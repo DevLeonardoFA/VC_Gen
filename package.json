@@ -1,0 +1,20 @@
+{
+  "name": "visual-composer-gen",
+  "version": "1.0.0",
+  "description": "Generate Visual Composer Elements",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "keywords": [
+    "StevesandCo"
+  ],
+  "author": "Leonardo Fernandes Alonso, Andre Attard",
+  "license": "ISC",
+  "devDependencies": {
+    "electron": "^28.2.0"
+  },
+  "dependencies": {
+    "jquery": "^3.7.1"
+  }
+}
