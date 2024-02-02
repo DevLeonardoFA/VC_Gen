@@ -9,9 +9,7 @@ const createWindow = () => {
     })
 
     mainWindow.webContents.openDevTools();
-
     mainWindow.setMenu(null)
-  
     mainWindow.loadFile('index.html');
 
 }

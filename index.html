@@ -2,14 +2,12 @@
 <html>
   <head>
     <meta charset="UTF-8">
+
     <!-- https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP -->
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'">
     <script src="./node_modules/jquery/dist/jquery.min.js"></script>
+
     <title>VC Gen</title>
-    
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500;700&display=swap" rel="stylesheet">
     
     <link rel="stylesheet" href="style.css">
 
@@ -47,16 +45,20 @@
                         
                         <div class="element">
                             <select name="type" id="type">
+
                                 <option value="textfield">textfield</option>
                                 <option value="textarea">textarea</option>
-                                <option value="attach_image">attach_image</option>
-                                <option value="attach_images">attach_images</option>
-                                <option value="posttypes">posttypes</option>
                                 <option value="colorpicker">colorpicker</option>
                                 <option value="exploded_textarea">exploded_textarea</option>
-                                <option value="widgetised_sidebars">widgetised_sidebars</option>
                                 <option value="textarea_raw_html">textarea_raw_html</option>
+
+                                <option value="attach_image">attach_image</option>
+                                <option value="attach_images">attach_images</option>
+
+                                <option value="posttypes">posttypes</option>
+                                <option value="widgetised_sidebars">widgetised_sidebars</option>
                                 <option value="vc_link">vc_link</option>
+                                
                                 <!-- <option value="checkbox">checkbox</option> -->
                                 <!-- <option value="dropdown">dropdown</option> -->
                                 <option value="loop-open">loop [open]</option>
@@ -82,6 +84,8 @@
         </form>
 
     </div>
+
+    
 
     <script src="gen.js"></script>
     <script src="add_element.js"></script>

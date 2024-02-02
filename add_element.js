@@ -1,9 +1,7 @@
-jQuery(function($){
-
     let elementsBox = $('#elements_box');
     let add_row = $('#add_row');
     
-    let elements = Array(
+    let elements_types = Array(
         'textfield',
         'textarea',
         'attach_image',
@@ -21,7 +19,7 @@ jQuery(function($){
         'css',
     );
     
-    let obj = create_obj(elements);
+    let obj = create_obj(elements_types);
 
     $('#add_row').on('click', function(e) {
 
@@ -41,7 +39,6 @@ jQuery(function($){
         if(element.length > 1){
             $(element).last().remove();
         }
-        // Remove the last element
         
     });
 
@@ -75,31 +72,28 @@ jQuery(function($){
     //create obj
     function create_obj(elements){
 
-        var obj = "";
-        obj += '<div class="element">';
-        obj += '<select name="type" id="type">';
+        var obj = `<div class="element"><select name="type" id="type">`;
 
         for (let index = 0; index < elements.length; index++) {
             obj += `<option value="${slugify(elements[index])}">${elements[index]}</option>`;
         }
         
-        obj += '</select>';
-        obj += '<input type="text" name="new_field_name" id="new_field_name" placeholder="Field Name">';
-        obj += '</div>';
+        obj += `</select><input type="text" name="new_field_name" id="new_field_name" placeholder="Field Name"></div>`;
 
         return obj;
     }
 
+
     function create_option(){
-        var obj_2 = "";
-        obj_2 =  '<div class="new_option">';
-        obj_2 += '<input type="text" name="option" id="option">'
-        obj_2 += '<div id="btns">';
-        obj_2 += '<span id="add_option">+</span><span id="remove_option">-</span>';
-        obj_2 += '</div>';
-        obj_2 += '</div>';
+        var obj_2 = `
+
+        <div class="new_option">
+            <input type="text" name="option" id="option">
+            <div id="btns">
+                <span id="add_option">+</span>
+                <span id="remove_option">-</span>
+            </div>
+        </div>`;
 
         return obj_2;
     }
-    
-});

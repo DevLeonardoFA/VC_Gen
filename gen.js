@@ -5,15 +5,13 @@ let name = NaN;
 let base = NaN;
 let elements = NaN;
 
-$(form_gen).submit(function(e){
 
-    e.preventDefault();
-
-});
+$(form_gen).submit(function(e){e.preventDefault();});
 
 $(".gen_btn_group > button").on('click', function(){
 
     populate_variables();
+
     var gen_what = $(this).attr('id');
     var result = ""
 
@@ -44,8 +42,6 @@ $(".gen_btn_group > button").on('click', function(){
 
 });
 
-//main functions
-
 function populate_variables(){
 
     name = $('#name').val();
@@ -73,6 +69,13 @@ function populate_variables(){
 
 }
 
+
+
+
+
+
+
+// main Functions
 function gen_settings(name, base, elements){
 
     let gen_settings = `
@@ -87,11 +90,11 @@ function gen_settings(name, base, elements){
 	public static function `+slugify(name)+`_element_settings() {
 
         return [
-            "name"     => __( "`+name+`", `+base+` ),
-            "base"     => self::$vc_prefix . "`+slugify(name)+`",
+            "name"     => __( "`+ name +`", `+ base +` ),
+            "base"     => self::$vc_prefix . "`+ slugify(name) +`",
             "class"    => "",
             "params"   => [`
-                +elements_func(elements, base)+
+                + elements_func(elements, base)+
             `
             ]
         ];
@@ -120,32 +123,42 @@ function gen_render(name, elements){
     * 
     */
     public static function render_`+slugify(name)+`_section($atts, $content){
-
+        
         global $post;
+
         `;
+
 
         elements.forEach(element => {
 
+                if(element.type === 'loop-open'){
+                    $loop = 1;
+                    $loop = element.type === "loop-close" ? 0 : 1;
+                }
+
                 switch (element.type) {
                     case "loop-open":
-                        gen_render += `$`+element.field_slug+` = isset($atts['`+element.field_slug+`']) ? vc_param_group_parse_atts($atts['`+element.field_slug+`']) : [];`;
+                        gen_render += `$`+ element.field_slug +` = isset($atts['`+ element.field_slug +`']) ? vc_param_group_parse_atts($atts['`+ element.field_slug +`']);`;
                         break;
 
                     case "exploded_textarea":
-                        gen_render += `$`+element.field_slug+` = isset($atts['`+element.field_slug+`']) ? explode( PHP_EOL, get_query_var($atts['`+element.field_slug+`'])) : []; `;
+                        gen_render += `$`+ element.field_slug +` = isset($atts['`+element.field_slug+`'])   ? explode( PHP_EOL, $atts['`+element.field_slug+`']) : []; `;
                         break;
 
                     case "vc_link":
-                        gen_render += `$`+element.field_slug+` = isset($atts['`+element.field_slug+`']) ? vc_build_link(get_query_var($atts['`+element.field_slug+`'])) : '';`;
+                        gen_render += `$`+ element.field_slug +` = isset($atts['`+element.field_slug+`'])   ? vc_build_link($atts['`+element.field_slug+`']) : '';`;
+                        break;
+
+                    case "attach_image":
+                        gen_render += `$`+ element.field_slug +` = isset($atts['`+element.field_slug+`'])   ? vc_build_link($atts['`+element.field_slug+`']) : '';`;
                         break;
                 
                     default:
-                        gen_render += `$`+element.field_slug+` = isset($atts['`+element.field_slug+`']) ? get_query_var($atts['`+element.field_slug+`']) : '';`;
+                        gen_render += `$`+ element.field_slug +` = isset($atts['`+element.field_slug+`'])   ? $atts['`+element.field_slug+`'] : '';`;
                         break;
                 }
 
         });
-        
         
         
         gen_render += `
@@ -153,18 +166,23 @@ function gen_render(name, elements){
 
     ?>
         <section class="`+slugify(name)+`-section container">
-`;
+    `;
 
-elements.forEach(element => {
+    elements.forEach(element => {
 
-    if(element.type === 'textfield' || element.type === 'textarea' || element.type === 'colorpicker' || element.type === 'textarea_raw_html' || element.type === 'vc_link'){
-        gen_render += `<span class="`+element.field_slug+`"> <?= $atts[`+element.field_slug+`]; ?> </span>`;
-    }
+        if(element.type === 'textfield' || element.type === 'textarea' || element.type === 'colorpicker' || element.type === 'textarea_raw_html'){
+            gen_render += `<span class="`+element.field_slug+`"> <?= $atts['`+element.field_slug+`']; ?> </span>`;
+        }
 
+        if(element.type === 'loop-open'){
+            gen_render += `<div class="`+element.field_slug+`">`;
+        }else if(element.type === 'loop-close'){
+            gen_render += `</div>`;
+        }
 
-});
+    });
 
-gen_render += `
+    gen_render += `
         </section>
     <?php
 
@@ -181,20 +199,25 @@ function gen_shortcode(name){
     
     let gen_shortcode = `add_shortcode(self::$vc_prefix . '`+slugify(name)+`', __CLASS__ . '::render_`+slugify(name)+`_section');`;
     return gen_shortcode;
-
 }
 
 function gen_lean_map(name){
 
-    let get_lm = `vc_lean_map( self::$vc_prefix . '`+slugify(name)+`', __CLASS__ . '::`+slugify(name)+`_element_settings' );`;
+    let get_lm = `vc_lean_map( self::$vc_prefix . '`+ slugify(name) +`', __CLASS__ . '::`+ slugify(name) +`_element_settings' );`;
     return get_lm;
 
 }
 
 
 
-// others functions
 
+
+
+
+
+
+
+// others Functions
 async function copyToClipboard(text) {
     try {
       await navigator.clipboard.writeText(text);
