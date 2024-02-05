@@ -1,6 +1,4 @@
-@import "_fonts.scss";
-
-$main_font: 'Roboto Mono', monospace;
+$main_font: monospace;
 $text_color: #000000;
 
 $input_color: #000000;
@@ -19,6 +17,7 @@ $remove_row_bg: #e48585;
 
 *{
     font-family: $main_font;
+    user-select: none;
 }
 
 body{
@@ -33,9 +32,10 @@ body{
             padding: 5px;
             border: 1px solid $borders;
             border-radius: 3px;
-            color: $input_color
+            color: $input_color;
+            box-sizing: border-box;
             option{
-                color: $input_color
+                color: $input_color;
             }
         }
     
@@ -105,13 +105,13 @@ body{
 
                     .new_option {
                         display: grid;
-                        grid-template-columns: 1fr 1fr 1fr 1fr 60px;
+                        grid-template-columns: 1fr 1fr 1fr 1fr 50px;
                         grid-column: 1/6;
                         width: 100%;
 
                         input#option{
                             grid-column: 1/5;
-                            width: calc(100% - 15px);
+                            width: 100%;
                         }
     
                         div#btns{
@@ -120,25 +120,35 @@ body{
                             grid-template-columns: 50% 50%;
                             align-items: center;
                             justify-content: center;
+                            justify-items: center;
                             span{
-                                width: 90%;
+                                aspect-ratio: 1/1;
+                                width: 20px;
                                 text-align: center;
                                 background-color: $add_row_bg;
                                 color: $add_row_color;
                                 cursor: pointer;
+                                box-sizing: border-box;
+                                display: flex;
+                                align-items: center;
+                                justify-content: center;
+                                justify-items: center;
     
                                 &:last-child{
                                     background-color: $remove_row_bg;
                                 }
                             }
                         }
+
+                        &.buttons_false{
+                            grid-template-columns: 1fr;
+                            input#option{
+                                width: 100%;
+                            }
+                        }
                     }
 
                     
-                }
-    
-                input { 
-                    width: calc(100% - 11px);
                 }
             }
         }
