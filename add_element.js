@@ -84,7 +84,7 @@
 
     });
 
-    $('.element').on('click', '#add_option', (e) => {
+    $('body').on('click', '#add_option', (e) => {
 
         var father = $(e.target).closest('.element');
         var opt = create_option(true, 'Option');
@@ -94,7 +94,15 @@
 
     });
 
-    $('body').on('click', '#remove_option', (e) => { $(e.target).closest('.new_option').remove(); });
+    $('body').on('click', '#remove_option', (e) => {
+
+        var target = $(e.target).closest('.element').find('.new_option');
+        if( target.length === 1 ){
+            return;
+        }
+        $(e.target).closest('.new_option').remove();
+
+    });
 
 
 
