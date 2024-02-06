@@ -44,7 +44,7 @@
 
                         
                         <div class="element">
-                            <select name="type" id="type">
+                            <select name="type" class="select_type" id="type" >
 
                                 <option value="textfield">textfield</option>
                                 <option value="textarea">textarea</option>
@@ -59,8 +59,8 @@
                                 <option value="widgetised_sidebars">widgetised_sidebars</option>
                                 <option value="vc_link">vc_link</option>
                                 
-                                <!-- <option value="checkbox">checkbox</option> -->
-                                <!-- <option value="dropdown">dropdown</option> -->
+                                <option value="checkbox">checkbox</option>
+                                <option value="dropdown">dropdown</option>
                                 <option value="loop-open">loop [open]</option>
                                 <option value="loop-clsoe">loop [close]</option>
                                 <option value="css">css</option>
@@ -82,6 +82,11 @@
             </div>
 
         </form>
+
+        <div class="popup">
+            <span class="ok">Text copied to clipboard!</span>
+            <span class="error">You must set a Name, Base and Elements first</span>
+        </div>
 
     </div>
 

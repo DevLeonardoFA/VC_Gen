@@ -15,7 +15,13 @@ $(".gen_btn_group > button").on('click', function(){
     var gen_what = $(this).attr('id');
     var result = ""
 
-    if (!name || !elements || !base) return alert("You must set a Name, Base and Elements first");
+    if (!name || !elements || !base){
+        $('body').toggleClass('popup_on error');
+        setTimeout(() => {
+            $('body').toggleClass('popup_on error');
+        }, 1000);
+        return
+    }
 
     switch (gen_what) {
 
@@ -40,7 +46,13 @@ $(".gen_btn_group > button").on('click', function(){
     //pass to clipboard
     copyToClipboard(result);
 
+    $('body').toggleClass('popup_on ok');
+    setTimeout(() => {
+        $('body').toggleClass('popup_on ok');
+    }, 1000);
+
 });
+
 
 function populate_variables(){
 
@@ -52,11 +64,22 @@ function populate_variables(){
 
     for (let i = 0; i < elements_len.length; i++) {
 
-        let type = $(elements_len[i]).find('select').val();
-        let field_name = $(elements_len[i]).find('#new_field_name').val();
-        let field_slug = slugify(field_name);
+        let type =          $(elements_len[i]).find('select').val();
+        let field_name =    $(elements_len[i]).find('#new_field_name').val();
+        let field_slug =    slugify(field_name);
+        let field_options = [];
         
-        elements.push({type: type, field_name: field_name, field_slug: field_slug});
+        if(type === 'attach_images' || type === 'checkbox' || type === 'dropdown'){
+
+            let options = $(elements_len[i]).find('.new_option > input');
+            for (let j = 0; j < options.length; j++) {
+                field_options.push($(options[j]).val());
+            }
+
+        }
+        
+
+        elements.push({type: type, field_name: field_name, field_slug: field_slug, field_options: field_options});
 
     }
 
@@ -71,140 +94,146 @@ function populate_variables(){
 
 
 
-
-
-
-
 // main Functions
 function gen_settings(name, base, elements){
 
-    let gen_settings = `
-   
+    return `<?php 
     /**
-    * Element Gen 0`+ID+`
-	* Register fields for `+name+`
+    * Element Gen 0${ID}
+	* Register fields for ${name}
 	*
     * @return array
 	*/
-
-	public static function `+slugify(name)+`_element_settings() {
+    public static function ${slugify(name)}_element_settings() {
 
         return [
-            "name"     => __( "`+ name +`", `+ base +` ),
-            "base"     => self::$vc_prefix . "`+ slugify(name) +`",
+            "name"     => __( "${name}", ${base.toUpperCase()}_THEME_SLUG ),
+            "base"     => self::$vc_prefix . "${slugify(name)}",
             "class"    => "",
-            "params"   => [`
-                + elements_func(elements, base)+
-            `
+            "category" => ${base.toUpperCase()}_THEME_NAME,
+            "params"   => [
+                ${generateElements(elements, base)}
             ]
         ];
-
- 	}
-
-   `;
-
-   return gen_settings;
+        
+    }`;
 
 }
 
 function gen_render(name, elements){
     
-    var loop = 0;
-    let gen_render = `
-    
+    return `<?php
     /**
-    * Element Gen 0`+ID+` Render Function
-    * 
-    * 
-    * @param array  $atts
-    * @param string $content
-    *
-    * @return false|string
-    * 
-    */
-    public static function render_`+slugify(name)+`_section($atts, $content){
-        
+     * Element Gen 0${ID} Render Function
+     * 
+     * 
+     * @param array  $atts
+     * @param string $content
+     *
+     * @return false|string
+     * 
+     */
+    public static function render_${slugify(name)}_section($atts, $content){
+    
         global $post;
 
-        `;
+        ${elements.map(element => {
+            switch (element.type) {
+                case "loop-open":
+                    return `
+                    $${element.field_slug} = isset($atts['${element.field_slug}']) ? vc_param_group_parse_atts($atts['${element.field_slug}']) : []; 
+                    `;
+                case "exploded_textarea":
+                    return `
+                    $${element.field_slug} = isset($atts['${element.field_slug}']) ? explode( PHP_EOL, $atts['${element.field_slug}']) : [];
+                    `;
+                case "vc_link":
+                    return `
+                    $${element.field_slug} = isset($atts['${element.field_slug}']) ? vc_build_link($atts['${element.field_slug}']) : '';
+                    `;
+                case "attach_image":
+                    return `
+                    $${element.field_slug} = isset($atts['${element.field_slug}']) ? get_post_meta($atts['image'], '_wp_attachment_image_alt', TRUE) : '';
+                    `;
+                case "attach_images":
+                    return `
+                    $${element.field_slug} = isset($atts['${element.field_slug}']) ? wp_get_attachment_image( $atts['${element.field_slug}'], 'full' ) : '';
+                    `;
+                default:
+                    return `
+                    $${element.field_slug} = isset($atts['${element.field_slug}']) ? $atts['${element.field_slug}'] : '';
+                    `;
+            }
+        }).join("")}
 
+        ob_start();
+    ?>
+        <section class="${slugify(name)}-section container">
 
-        elements.forEach(element => {
-
-                if(element.type === 'loop-open'){
-                    $loop = 1;
-                    $loop = element.type === "loop-close" ? 0 : 1;
-                }
+            ${elements.map(element => {
 
                 switch (element.type) {
+
                     case "loop-open":
-                        gen_render += `$`+ element.field_slug +` = isset($atts['`+ element.field_slug +`']) ? vc_param_group_parse_atts($atts['`+ element.field_slug +`']);`;
-                        break;
+                        return `
+                        <div class="${element.field_slug}" data-aos-duration="2000" data-aos="fade-up">
+                            <?php foreach($${element.field_slug} as $loop_item){ ?>
+                        `;
+
+                    case "loop-close":
+                        return `
+                            <?php } ?>
+                        </div>
+                        `;
 
                     case "exploded_textarea":
-                        gen_render += `$`+ element.field_slug +` = isset($atts['`+element.field_slug+`'])   ? explode( PHP_EOL, $atts['`+element.field_slug+`']) : []; `;
-                        break;
+                        return `
+                        <div class="my-custom-shortcode">
+                            <?= esc_html($${element.field_slug}['exploded_textarea']); ?>
+                        </div>
+                        `;
 
                     case "vc_link":
-                        gen_render += `$`+ element.field_slug +` = isset($atts['`+element.field_slug+`'])   ? vc_build_link($atts['`+element.field_slug+`']) : '';`;
-                        break;
+                        return `
+                        <a data-aos-duration="2000" data-aos="fade-up" href="<?= $${element.field_slug}['url']; ?>" target="<?= $${element.field_slug}['target']; ?>" class="purple-button">
+                            <?= $${element.field_slug}['title']; ?>
+                        </a>
+                        `;
 
                     case "attach_image":
-                        gen_render += `$`+ element.field_slug +` = isset($atts['`+element.field_slug+`'])   ? vc_build_link($atts['`+element.field_slug+`']) : '';`;
-                        break;
-                
+                        return `
+                        <img src="<?= wp_get_attachment_image_url( $${element.field_slug}, 'full', '', '' ); ?>" alt="<?= $${element.field_slug} ?>"></img>
+                        `;
+
                     default:
-                        gen_render += `$`+ element.field_slug +` = isset($atts['`+element.field_slug+`'])   ? $atts['`+element.field_slug+`'] : '';`;
-                        break;
+                        return `
+                        <span class="${element.field_slug}">
+                            <?= $atts['${element.field_slug}']; ?> or <?= $${element.field_slug} ?>
+                        </span>
+                        `;
+
                 }
+            }).join("")}
 
-        });
-        
-        
-        gen_render += `
-        ob_start();
-
-    ?>
-        <section class="`+slugify(name)+`-section container">
-    `;
-
-    elements.forEach(element => {
-
-        if(element.type === 'textfield' || element.type === 'textarea' || element.type === 'colorpicker' || element.type === 'textarea_raw_html'){
-            gen_render += `<span class="`+element.field_slug+`"> <?= $atts['`+element.field_slug+`']; ?> </span>`;
-        }
-
-        if(element.type === 'loop-open'){
-            gen_render += `<div class="`+element.field_slug+`">`;
-        }else if(element.type === 'loop-close'){
-            gen_render += `</div>`;
-        }
-
-    });
-
-    gen_render += `
         </section>
     <?php
-
         return ob_get_clean();
-
-    }`;
-
-    return gen_render;
+    }
+    ?>`;
 
 
 }
 
 function gen_shortcode(name){
     
-    let gen_shortcode = `add_shortcode(self::$vc_prefix . '`+slugify(name)+`', __CLASS__ . '::render_`+slugify(name)+`_section');`;
-    return gen_shortcode;
+    return `add_shortcode(self::$vc_prefix . '${slugify(name)}', __CLASS__ . '::render_${slugify(name)}_section');`;
+
 }
 
 function gen_lean_map(name){
 
-    let get_lm = `vc_lean_map( self::$vc_prefix . '`+ slugify(name) +`', __CLASS__ . '::`+ slugify(name) +`_element_settings' );`;
-    return get_lm;
+    return `vc_lean_map( self::$vc_prefix . '${slugify(name)}', __CLASS__ . '::${slugify(name)}_element_settings' );`;
+
 
 }
 
@@ -221,7 +250,6 @@ function gen_lean_map(name){
 async function copyToClipboard(text) {
     try {
       await navigator.clipboard.writeText(text);
-      console.log('Text copied to clipboard!');
     } catch (error) {
       console.error('Failed to copy text to clipboard:', error);
     }
@@ -238,13 +266,16 @@ function elements_func(elements, base){
         let type = elements[position].type;
         let name = elements[position].field_name;
         let slug = elements[position].field_slug;
+        let options = elements[position].field_options;
+
+        console.log(options[0]);
 
         switch (type) {
             case 'loop-open':
                 return_elements += `
                 [
                     "type" => "loop",
-                    "heading" => __( "`+name+`", "`+base+`" ),
+                    "heading" => __( "`+name+`", "${base.toUpperCase()}_THEME_SLUG" ),
                     "param_name" => "`+slug+`",
                     "params" => [`;
                 break;
@@ -261,22 +292,33 @@ function elements_func(elements, base){
                     return_elements += `
                         [
                             "type" => "`+type+`",
-                            "heading" => __( "`+name+`", "`+base+`" ),
+                            "heading" => __( "`+name+`", "${base.toUpperCase()}_THEME_SLUG" ),
                             "param_name" => "content",
                         ],`;
                 }
                 break;
 
-            case 'dropdown':
+            case 'attach_images':
+                return_elements += `
+                    [
+                        "type" => "`+type+`",
+                        "heading" => __( "`+name+`", "${base.toUpperCase()}_THEME_SLUG" ),
+                        "param_name" => "${type + '_' + slugify(name)}",
+                    ],`;
+                break;
+
+            case 'dropdown' || 'checkbox':
                 return_elements += `
                         [
                             "type" => "`+type+`",
-                            "heading" => __( "`+name+`", "`+base+`" ),
-                            "param_name" => "content",
+                            "heading" => __( "`+name+`", "${base.toUpperCase()}_THEME_SLUG" ),
+                            "param_name" => "${type + '_' + slugify(name)}",
                             "value" => array(
-                                'Option 1' => 'value1',
-                                'Option 2' => 'value2',
-                                'Option 3' => 'value3',
+                                ${
+                                    options.forEach(option => {
+                                        `'${options}' => '${option}'`;
+                                    })
+                                }
                             ),
                         ],`;
                 break;
@@ -285,7 +327,7 @@ function elements_func(elements, base){
                 return_elements += `
                         [
                             "type" => "`+type+`",
-                            "heading" => __( "`+name+`", "`+base+`" ),
+                            "heading" => __( "`+name+`", "${base.toUpperCase()}_THEME_SLUG" ),
                             "param_name" => "`+slug+`",
                         ],`;
                 break;
@@ -297,6 +339,76 @@ function elements_func(elements, base){
 
     return return_elements;
     
+}
+
+function generateElements(elements, base) {
+    let returnElements = '';
+
+    for (let position = 0; position < elements.length; position++) {
+        let wysiwyg = 0;
+
+        let { type, field_name: name, field_slug: slug, field_options: options } = elements[position];
+
+        switch (type) {
+            case 'loop-open':
+                returnElements += `
+                [
+                    "type" => "loop",
+                    "heading" => __( "${name}", "${base}" ),
+                    "param_name" => "${slug}",
+                    "params" => [`;
+                break;
+
+            case 'loop-close':
+                returnElements += `
+                    ]
+                ],`;
+                break;
+
+            case 'textarea_html':
+                if (wysiwyg === 0) {
+                    wysiwyg = 1;
+                    returnElements += `
+                        [
+                            "type" => "${type}",
+                            "heading" => __( "${name}", "${base}" ),
+                            "param_name" => "${type + '_' + slugify(name)}",
+                        ],`;
+                }
+                break;
+
+            case 'attach_images':
+                returnElements += `
+                    [
+                        "type" => "${type}",
+                        "heading" => __( "${name}", "${base}" ),
+                        "param_name" => "${type + '_' + slugify(name)}",
+                    ],`;
+                break;
+
+            case 'dropdown':
+            case 'checkbox':
+                returnElements += `
+                        [
+                            "type" => "${type}",
+                            "heading" => __( "${name}", "${base}" ),
+                            "param_name" => "${type + '_' + slugify(name)}",
+                            "value" => [${options.map(option => ` \ '${slugify(option)}' => '${option}'`).join(',')}]
+                        ],`;
+                break;
+
+            default:
+                returnElements += `
+                        [
+                            "type" => "${type}",
+                            "heading" => __( "${name}", "${base}" ),
+                            "param_name" => "${type + '_' + slugify(name)}",
+                        ],`;
+                break;
+        }
+    }
+
+    return returnElements;
 }
 
 function slugify(str) {

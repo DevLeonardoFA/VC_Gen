@@ -1,5 +1,6 @@
     let elementsBox = $('#elements_box');
     let add_row = $('#add_row');
+    let selects = $('.element select');
     
     let elements_types = Array(
         'textfield',
@@ -12,14 +13,17 @@
         'widgetised_sidebars',
         'textarea_raw_html',
         'vc_link',
-        // 'checkbox',
-        // 'dropdown',
-        'loop open',
-        'loop close',
+        'checkbox',
+        'dropdown',
+        'loop-open',
+        'loop-close',
         'css',
     );
     
     let obj = create_obj(elements_types);
+
+
+    // done and working very well
 
     $('#add_row').on('click', function(e) {
 
@@ -42,58 +46,100 @@
         
     });
 
-    $('select#type').change(function(){
-        if( $(this).val() === "dropdown" || $(this).val() === "checkbox" ){
+    $('body').on('change', '.select_type', function() {
 
+        if( $(this).val() === "dropdown" || $(this).val() === "checkbox" ){
+    
             var father = $(this).parent();
-            var opt = create_option();
+            var opt = create_option(true, "Option");
+
+            if($(father).find('.new_option')){
+                $(father).find('.new_option').remove();
+            }
             
             // Append the new option
             $(father).append(opt);
             
         }
+
+        else if( $(this).val() === "attach_images"){
+
+            var father = $(this).parent();
+            var opt = create_option(false, "Maximum number of images");
+
+            if($(father).find('.new_option')){
+                $(father).find('.new_option').remove();
+            }
+            
+            // Append the new option
+            $(father).append(opt);
+            
+        }
+
+        else{
+            
+            $(this).parent().find('.new_option').remove();
+
+        }
+
     });
 
-    // $('#add_option').on('click', function(){
+    $('body').on('click', '#add_option', (e) => {
 
-    //     console,log('aaaaaaaaaa');
-
-    //     var father = $(this).closest('.element');
-    //     var opt = create_option();
+        var father = $(e.target).closest('.element');
+        var opt = create_option(true, 'Option');
         
-    //     // Append the new option
-    //     $(father).append(opt);
+        // Append the new option
+        $(father).append(opt);
 
-    // });
+    });
 
-    // $('#remove_option').on('click', () => { console,log('aaaaaaaaaa'); $(this).closest('.new_option').remove(); });
+    $('body').on('click', '#remove_option', (e) => {
+
+        var target = $(e.target).closest('.element').find('.new_option');
+        if( target.length === 1 ){
+            return;
+        }
+        $(e.target).closest('.new_option').remove();
+
+    });
+
 
 
     //create obj
     function create_obj(elements){
 
-        var obj = `<div class="element"><select name="type" id="type">`;
+        let optionsHTML = '';
 
         for (let index = 0; index < elements.length; index++) {
-            obj += `<option value="${slugify(elements[index])}">${elements[index]}</option>`;
+            optionsHTML += `<option value="${elements[index]}">${elements[index]}</option>`;
         }
-        
-        obj += `</select><input type="text" name="new_field_name" id="new_field_name" placeholder="Field Name"></div>`;
 
-        return obj;
-    }
-
-
-    function create_option(){
-        var obj_2 = `
-
-        <div class="new_option">
-            <input type="text" name="option" id="option">
-            <div id="btns">
-                <span id="add_option">+</span>
-                <span id="remove_option">-</span>
-            </div>
+        return `<div class="element">
+            <select name="type" class="select_type" id="type" >
+                ${optionsHTML}
+            </select>
+            <input type="text" name="new_field_name" id="new_field_name" placeholder="Field Name">
         </div>`;
 
-        return obj_2;
+    }
+
+    function create_option(buttons, placeholder){
+
+        var buttons_html = '';
+
+        if(buttons){
+
+            buttons_html = `<div id="btns">
+                <span id="add_option">+</span>
+                <span id="remove_option">-</span>
+            </div>`;
+
+        }
+
+        return `<div class="new_option buttons_${JSON.stringify(buttons)}">
+            <input type="text" name="option" id="option" placeholder="${placeholder}"/>
+            ${buttons_html}
+        </div>`;
+
     }

@@ -1,6 +1,6 @@
 {
   "name": "visual-composer-gen",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "Generate Visual Composer Elements",
   "main": "main.js",
   "scripts": {

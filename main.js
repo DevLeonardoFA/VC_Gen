@@ -4,12 +4,13 @@ let mainWindow;
 
 const createWindow = () => {
     const mainWindow = new BrowserWindow({
-      width: 1000,
-      height: 600
+        width: 1000,
+        height: 600,
+        
     })
 
     mainWindow.webContents.openDevTools();
-    mainWindow.setMenu(null)
+    mainWindow.setMenu(null);
     mainWindow.loadFile('index.html');
 
 }
@@ -20,6 +21,7 @@ app.on('window-all-closed', () => {
 
 
 app.whenReady().then(() => {
+
     createWindow()
   
     app.on('activate', () => {
