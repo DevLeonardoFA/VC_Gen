@@ -9,3 +9,9 @@ npm -i
 ```bash
 npm start
 ```
+
+3º - If u want an .exe
+
+```bash
+nelectron-packager [from] [.exe name] --platform=win32 --arch=x64
+```
