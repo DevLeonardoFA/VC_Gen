@@ -1,4 +1,4 @@
-1º - install all node modules
+1º - Install all node modules
 
 ```bash
 npm -i
