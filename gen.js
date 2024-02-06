@@ -146,6 +146,8 @@ function gen_render(name, elements){
                     return `
                     $${element.type + "_" + element.field_slug} = isset($atts['${element.type + "_" + element.field_slug}']) ? vc_param_group_parse_atts($atts['${element.type + "_" + element.field_slug}']) : []; 
                     `;
+                case "param_group_close":
+                    return ``;
                 case "exploded_textarea":
                     return `
                     $${element.type + "_" + element.field_slug} = isset($atts['${element.type + "_" + element.field_slug}']) ? explode( " ", $atts['${element.type + "_" + element.field_slug}']) : [];
@@ -211,7 +213,21 @@ function gen_render(name, elements){
 
                     case "attach_image":
                         return `
-                        <img src="$${element.type + "_" + element.field_slug}" alt="IMG"></img>
+                        <img src="<?= $${element.type + "_" + element.field_slug} ?>" alt="IMG"></img>
+                        `;
+
+                    case "attach_images":
+                        return `
+                        
+                        <?php 
+
+                            $imgs = explode(',', $atts['${element.type + "_" + element.field_slug}']);
+                            foreach($imgs as $img){ 
+                                echo wp_get_attachment_image( $img, 'full' );
+                            }
+                            
+                        ?>
+                        
                         `;
 
                     case "loop":
@@ -235,6 +251,12 @@ function gen_render(name, elements){
                         </div>
                         `;
 
+                    case "textarea_html":
+                        return `
+                        <span class="${element.type + "_" + element.field_slug}">
+                            <?= $content; ?>
+                        </span>
+                        `;
                     default:
                         return `
                         <span class="${element.type + "_" + element.field_slug}">
@@ -289,9 +311,10 @@ async function copyToClipboard(text) {
 
 function generateElements(elements, base) {
     let returnElements = '';
+    let wysiwyg = 0;
 
     for (let position = 0; position < elements.length; position++) {
-        let wysiwyg = 0;
+        
 
         let { type, field_name: name, field_slug: slug, field_options: options } = elements[position];
 
@@ -318,7 +341,7 @@ function generateElements(elements, base) {
                         [
                             "type" => "${type}",
                             "heading" => __( "${name}", ${base.toUpperCase()}_THEME_SLUG ),
-                            "param_name" => "${type + '_' + slugify(name)}",
+                            "param_name" => "content",
                         ],`;
                 }
                 break;

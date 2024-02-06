@@ -3,13 +3,14 @@ const { app, BrowserWindow } = require('electron');
 let mainWindow;
 
 const createWindow = () => {
+    
     const mainWindow = new BrowserWindow({
         width: 1000,
         height: 600,
         
     })
 
-    mainWindow.webContents.openDevTools();
+    // mainWindow.webContents.openDevTools();
     mainWindow.setMenu(null);
     mainWindow.loadFile('index.html');
 

@@ -3,6 +3,7 @@
     let selects = $('.element select');
     
     let elements_types = Array(
+        'textarea_html',
         'textfield',
         'textarea',
         'attach_image',
@@ -61,20 +62,6 @@
             $(father).append(opt);
             
         }
-
-        // else if( $(this).val() === "attach_images"){
-
-        //     var father = $(this).parent();
-        //     var opt = create_option(false, "Maximum number of images");
-
-        //     if($(father).find('.new_option')){
-        //         $(father).find('.new_option').remove();
-        //     }
-            
-        //     // Append the new option
-        //     $(father).append(opt);
-            
-        // }
 
         else{
             
