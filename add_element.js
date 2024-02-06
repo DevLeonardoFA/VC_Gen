@@ -15,9 +15,9 @@
         'vc_link',
         'checkbox',
         'dropdown',
-        'loop-open',
-        'loop-close',
-        'css',
+        'loop',
+        'param_group_open',
+        'param_group_close',
     );
     
     let obj = create_obj(elements_types);
@@ -62,19 +62,19 @@
             
         }
 
-        else if( $(this).val() === "attach_images"){
+        // else if( $(this).val() === "attach_images"){
 
-            var father = $(this).parent();
-            var opt = create_option(false, "Maximum number of images");
+        //     var father = $(this).parent();
+        //     var opt = create_option(false, "Maximum number of images");
 
-            if($(father).find('.new_option')){
-                $(father).find('.new_option').remove();
-            }
+        //     if($(father).find('.new_option')){
+        //         $(father).find('.new_option').remove();
+        //     }
             
-            // Append the new option
-            $(father).append(opt);
+        //     // Append the new option
+        //     $(father).append(opt);
             
-        }
+        // }
 
         else{
             
