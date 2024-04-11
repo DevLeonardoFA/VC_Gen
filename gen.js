@@ -78,7 +78,6 @@ function populate_variables(){
 
         }
         
-
         elements.push({type: type, field_name: field_name, field_slug: field_slug, field_options: field_options});
 
     }
@@ -164,6 +163,10 @@ function gen_render(name, elements){
                     return `
                     $${element.type + "_" + element.field_slug} = isset($atts['${element.type + "_" + element.field_slug}']) ? wp_get_attachment_image( $atts['${element.type + "_" + element.field_slug}'], 'full' ) : '';
                     `;
+                case "textarea_html":
+                    return `
+                    $${element.type + "_" + element.field_slug} = $content;
+                    `;
                 default:
                     return `
                     $${element.type + "_" + element.field_slug} = isset($atts['${element.type + "_" + element.field_slug}']) ? $atts['${element.type + "_" + element.field_slug}'] : '';
@@ -173,100 +176,129 @@ function gen_render(name, elements){
 
         ob_start();
     ?>
-        <section class="${slugify(name)}-section container">
+        <section class="${slugify(name)}-section" data-aos-duration="2000" data-aos="fade-up">
+            <div class="container">
 
-            ${elements.map(element => {
+                ${elements.map(element => {
 
-                switch (element.type) {
+                    switch (element.type) {
 
-                    case "param_group_open":
-                        return `
-                        <div class="${element.type + "_" + element.field_slug}" data-aos-duration="2000" data-aos="fade-up">
-                            <?php foreach($${element.type + "_" + element.field_slug} as $loop_item){ ?>
-                        `;
+                        case "param_group_open":
+                            return `
+                                <div class="${element.type + "_" + element.field_slug}">
+                                <?php foreach($${element.type + "_" + element.field_slug} as $loop_item){ ?>
+                            `;
 
-                    case "param_group_close":
-                        return `
+                        case "param_group_close":
+                            return `
+                                <?php } ?>
+                            </div>
+                            `;
+
+                        case "exploded_textarea":
+                            return `
+                            <?php if(isset($atts[${element.type + "_" + element.field_slug}])){ ?>
+                                <div class="exploded_textarea">
+
+                                    <?php 
+                                        foreach($${element.type + "_" + element.field_slug} as $word){
+                                            echo '<p>' . $word . '</p>';
+                                        }
+                                    ?>
+                                    
+                                </div>
                             <?php } ?>
-                        </div>
-                        `;
+                            `;
 
-                    case "exploded_textarea":
-                        return `
-                        <div class="exploded_textarea">
+                        case "vc_link":
+                            return `
+                            <?php if( isset($atts['${type}_${slug}']) ){ ?>
+                                <a data-aos-duration="2000" data-aos="fade-up" href="<?= $${element.type + "_" + element.field_slug}['url']; ?>" target="<?= $${element.type + "_" + element.field_slug}['target']; ?>" class="purple-button">
+                                    <?= $${element.type + "_" + element.field_slug}['title']; ?>
+                                </a>
+                            <?php } ?>
+                            `;
 
+                        case "attach_image":
+
+                            return `
+                            <?php if( isset($atts['${element.type + "_" + element.field_slug}']) ){ 
+                                $alt = get_post_meta($atts['${element.type + "_" + element.field_slug}'], '_wp_attachment_image_alt', TRUE); ?>
+                                <img src="<?= $${element.type + "_" + element.field_slug} ?>" alt="<?= $alt; ?>" title="<?= $alt; ?>"></img>
+                            <?php } ?>
+                            `;
+
+                        case "attach_images":
+                            return `
+                            
                             <?php 
-                                foreach($${element.type + "_" + element.field_slug} as $word){
-                                    echo '<p>' . $word . '</p>';
-                                }
-                            ?>
                             
-                        </div>
-                        `;
+                                if( isset($atts['${type}_${slug}']) ){
+                                    $imgs = explode(',', $atts['${element.type + "_" + element.field_slug}']);
+                                        
+                                    foreach($imgs as $img){ 
 
-                    case "vc_link":
-                        return `
-                        <a data-aos-duration="2000" data-aos="fade-up" href="<?= $${element.type + "_" + element.field_slug}['url']; ?>" target="<?= $${element.type + "_" + element.field_slug}['target']; ?>" class="purple-button">
-                            <?= $${element.type + "_" + element.field_slug}['title']; ?>
-                        </a>
-                        `;
+                                        $alt = get_post_meta($atts['${type}_${slug}'], '_wp_attachment_image_alt', TRUE);
+                                        $url = wp_get_attachment_image_url( $img, 'full' ); ?>
+                                        
+                                        <img src="<?= $url; ?>" alt="<?= $alt; ?>" title="<?= $alt; ?>" />
 
-                    case "attach_image":
-                        return `
-                        <img src="<?= $${element.type + "_" + element.field_slug} ?>" alt="IMG"></img>
-                        `;
-
-                    case "attach_images":
-                        return `
-                        
-                        <?php 
-
-                            $imgs = explode(',', $atts['${element.type + "_" + element.field_slug}']);
-                            foreach($imgs as $img){ 
-                                echo wp_get_attachment_image( $img, 'full' );
-                            }
-                            
-                        ?>
-                        
-                        `;
-
-                    case "loop":
-                        return `
-                        <div class="${element.type + "_" + element.field_slug}">
-                        
-                            <?php
-                            
-                                $query = new WP_Query($loop);
-
-                                if ($query->have_posts()) {
-                                    while ($query->have_posts()) {
-                                        $query->the_post();
+                                    <?php
                                     }
+
                                 }
-
-                                wp_reset_postdata();
-
+                                
                             ?>
+                            
+                            `;
+
+                        case "loop":
+                            return `
+
+                            <?php if(isset($atts[${element.type + "_" + element.field_slug}])){ ?>
+
+                                <div class="${element.type + "_" + element.field_slug}">
+                                    <?php
+                                    
+                                        $query = new WP_Query($loop);
+
+                                        if ($query->have_posts()) {
+                                            while ($query->have_posts()) {
+                                                $query->the_post();
+                                            }
+                                        }
+
+                                        wp_reset_postdata();
+
+                                    ?>
+                                </div>
+
+                            <?php } ?>
+
+                            `;
+
+                        case "textarea_html":
+                            return `
+                            <?php if($content){ ?>
+                                <span class="${element.type + "_" + element.field_slug}">
+                                    <?= $content; ?>
+                                </span>
+                            <?php } ?>
+                            `;
                         
-                        </div>
-                        `;
+                        default:
+                            return `
+                            <?php if(isset($atts[${element.type + "_" + element.field_slug}])){ ?>
+                                <span class="${element.type + "_" + element.field_slug}">
+                                    <?= $atts['${element.type + "_" + element.field_slug}']; ?>
+                                </span>
+                            <?php } ?>
+                            `;
 
-                    case "textarea_html":
-                        return `
-                        <span class="${element.type + "_" + element.field_slug}">
-                            <?= $content; ?>
-                        </span>
-                        `;
-                    default:
-                        return `
-                        <span class="${element.type + "_" + element.field_slug}">
-                            <?= $atts['${element.type + "_" + element.field_slug}']; ?> or <?= $${element.type + "_" + element.field_slug} ?>
-                        </span>
-                        `;
+                    }
+                }).join("")}
 
-                }
-            }).join("")}
-
+            </div>
         </section>
     <?php
 
