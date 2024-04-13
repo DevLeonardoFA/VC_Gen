@@ -30,10 +30,16 @@ export function gen_settings(type, name, base){
 
 export function gen_render(type, slug){
     return `
-        <?php if($content){ ?>
-            <span class="${type}_${slug}">
-                <?= $content; ?>
-            </span>
+        <?php 
+        
+        if($content){ ?>
+            
+            $alt = get_post_meta($atts['${type}_${slug}'], '_wp_attachment_image_alt', TRUE);
+            $url = wp_get_attachment_image_url( $atts['${type}_${slug}'], 'full' ); ?>
+                
+            <img src="<?= $url; ?>" alt="<?= $alt; ?>" title="<?= $alt; ?>" />
+
         <?php } ?>
+        
     `;
 }

@@ -31,7 +31,9 @@ export function gen_settings(type, name, base){
 
 export function gen_render(type, slug){
     return `
-        <?php if(isset($atts[${type}_${slug}])){ ?>
+        <?php 
+        
+        if(isset($atts[${type}_${slug}])){ ?>
 
             <span class="${type}_${slug}">
                 <?= $atts['${type}_${slug}']; ?>

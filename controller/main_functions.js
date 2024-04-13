@@ -1,5 +1,27 @@
 import { Slugfy, GenerateElements } from "./../controller/support_functions.js";
 
+// all elements
+import attach_image  from '../elements/attach_image.js';
+import attach_images from '../elements/attach_images.js';
+import checkbox      from '../elements/checkbox.js';
+import dropdown      from '../elements/dropdown.js';
+import loop          from '../elements/loop.js';
+import param_group   from '../elements/param_group.js';
+import vc_link       from '../elements/vc_link.js';
+import default_field from '../elements/default.js';
+import textarea_html from '../elements/textarea_html.js';
+import exploded_textarea from '../elements/exploded_textarea.js';
+
+let obj_attach_image    = new attach_image();
+let obj_attach_images   = new attach_images();
+let obj_checkbox        = new checkbox();
+let obj_dropdown        = new dropdown();
+let obj_loop            = new loop();
+let obj_param_group     = new param_group();
+let obj_vc_link         = new vc_link();
+let obj_default_field   = new default_field();
+let obj_textarea_html   = new textarea_html();
+let obj_exploded_textarea = new exploded_textarea();
 
 export default class main_functions{
     
@@ -50,6 +72,8 @@ export async function CopyToClipboard(code_generated) {
 }
 
 
+
+
 // main Functions
 export function Gen_Settings(name, base, elements, ID){
 
@@ -79,7 +103,7 @@ export function Gen_Settings(name, base, elements, ID){
 
 }
 
-export function Gen_Render(name, elements){
+export function Gen_Render(name, elements, ID){
     
     return `
     /**
@@ -96,41 +120,6 @@ export function Gen_Render(name, elements){
     
         global $post;
 
-        ${elements.map(element => {
-            switch (element.type) {
-                case "param_group_open":
-                    return `
-                    $${element.type + "_" + element.field_slug} = isset($atts['${element.type + "_" + element.field_slug}']) ? vc_param_group_parse_atts($atts['${element.type + "_" + element.field_slug}']) : []; 
-                    `;
-                case "param_group_close":
-                    return ``;
-                case "exploded_textarea":
-                    return `
-                    $${element.type + "_" + element.field_slug} = isset($atts['${element.type + "_" + element.field_slug}']) ? explode( " ", $atts['${element.type + "_" + element.field_slug}']) : [];
-                    `;
-                case "vc_link":
-                    return `
-                    $${element.type + "_" + element.field_slug} = isset($atts['${element.type + "_" + element.field_slug}']) ? vc_build_link($atts['${element.type + "_" + element.field_slug}']) : '';
-                    `;
-                case "attach_image":
-                    return `
-                    $${element.type + "_" + element.field_slug} = isset($atts['${element.type + "_" + element.field_slug}']) ? wp_get_attachment_url( $atts['${element.type + "_" + element.field_slug}'], 'full' ) : '';
-                    `;
-                case "attach_images":
-                    return `
-                    $${element.type + "_" + element.field_slug} = isset($atts['${element.type + "_" + element.field_slug}']) ? wp_get_attachment_image( $atts['${element.type + "_" + element.field_slug}'], 'full' ) : '';
-                    `;
-                case "textarea_html":
-                    return `
-                    $${element.type + "_" + element.field_slug} = $content;
-                    `;
-                default:
-                    return `
-                    $${element.type + "_" + element.field_slug} = isset($atts['${element.type + "_" + element.field_slug}']) ? $atts['${element.type + "_" + element.field_slug}'] : '';
-                    `;
-            }
-        }).join("")}
-
         ob_start();
     ?>
         <section class="${Slugfy(name)}-section" data-aos-duration="2000" data-aos="fade-up">
@@ -141,116 +130,31 @@ export function Gen_Render(name, elements){
                     switch (element.type) {
 
                         case "param_group_open":
-                            return `
-                                <div class="${element.type + "_" + element.field_slug}">
-                                <?php foreach($${element.type + "_" + element.field_slug} as $loop_item){ ?>
-                            `;
+                            return obj_param_group.gen_render(type, name, base, "open");;
 
                         case "param_group_close":
-                            return `
-                                <?php } ?>
-                            </div>
-                            `;
+                            return obj_param_group.gen_render(type, name, base, "close");
 
                         case "exploded_textarea":
-                            return `
-                            <?php if(isset($atts[${element.type + "_" + element.field_slug}])){ ?>
-                                <div class="exploded_textarea">
-
-                                    <?php 
-                                        foreach($${element.type + "_" + element.field_slug} as $word){
-                                            echo '<p>' . $word . '</p>';
-                                        }
-                                    ?>
-                                    
-                                </div>
-                            <?php } ?>
-                            `;
+                            return obj_exploded_textarea.gen_render(type, name, base);
 
                         case "vc_link":
-                            return `
-                            <?php if( isset($atts['${type}_${slug}']) ){ ?>
-                                <a data-aos-duration="2000" data-aos="fade-up" href="<?= $${element.type + "_" + element.field_slug}['url']; ?>" target="<?= $${element.type + "_" + element.field_slug}['target']; ?>" class="purple-button">
-                                    <?= $${element.type + "_" + element.field_slug}['title']; ?>
-                                </a>
-                            <?php } ?>
-                            `;
+                            return obj_vc_link.gen_render(type, name, base);
 
                         case "attach_image":
-
-                            return `
-                            <?php if( isset($atts['${element.type + "_" + element.field_slug}']) ){ 
-                                $alt = get_post_meta($atts['${element.type + "_" + element.field_slug}'], '_wp_attachment_image_alt', TRUE); ?>
-                                <img src="<?= $${element.type + "_" + element.field_slug} ?>" alt="<?= $alt; ?>" title="<?= $alt; ?>"></img>
-                            <?php } ?>
-                            `;
+                            return obj_attach_image.gen_render(type, name, base);
 
                         case "attach_images":
-                            return `
-                            
-                            <?php 
-                            
-                                if( isset($atts['${type}_${slug}']) ){
-                                    $imgs = explode(',', $atts['${element.type + "_" + element.field_slug}']);
-                                        
-                                    foreach($imgs as $img){ 
-
-                                        $alt = get_post_meta($atts['${type}_${slug}'], '_wp_attachment_image_alt', TRUE);
-                                        $url = wp_get_attachment_image_url( $img, 'full' ); ?>
-                                        
-                                        <img src="<?= $url; ?>" alt="<?= $alt; ?>" title="<?= $alt; ?>" />
-
-                                    <?php
-                                    }
-
-                                }
-                                
-                            ?>
-                            
-                            `;
+                            return obj_attach_images.gen_render(type, name, base);
 
                         case "loop":
-                            return `
-
-                            <?php if(isset($atts[${element.type + "_" + element.field_slug}])){ ?>
-
-                                <div class="${element.type + "_" + element.field_slug}">
-                                    <?php
-                                    
-                                        $query = new WP_Query($loop);
-
-                                        if ($query->have_posts()) {
-                                            while ($query->have_posts()) {
-                                                $query->the_post();
-                                            }
-                                        }
-
-                                        wp_reset_postdata();
-
-                                    ?>
-                                </div>
-
-                            <?php } ?>
-
-                            `;
+                            return obj_loop.gen_render(type, name, base);
 
                         case "textarea_html":
-                            return `
-                            <?php if($content){ ?>
-                                <span class="${element.type + "_" + element.field_slug}">
-                                    <?= $content; ?>
-                                </span>
-                            <?php } ?>
-                            `;
+                            return obj_textarea_html.gen_render(type, name, base);
                         
                         default:
-                            return `
-                            <?php if(isset($atts[${element.type + "_" + element.field_slug}])){ ?>
-                                <span class="${element.type + "_" + element.field_slug}">
-                                    <?= $atts['${element.type + "_" + element.field_slug}']; ?>
-                                </span>
-                            <?php } ?>
-                            `;
+                            return obj_default_field.gen_render(type, name, base);
 
                     }
                 }).join("")}

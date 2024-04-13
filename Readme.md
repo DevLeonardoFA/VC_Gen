@@ -1,7 +1,7 @@
 1º - Install all node modules
 
 ```bash
-npm -i
+npm install
 ```
 
 2º - Now you can run using

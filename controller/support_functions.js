@@ -108,6 +108,14 @@ export function Populate_Variables(ID){
     var name = $('#name').val();
     var base = Slugfy($('#base').val());
     var elements = [];
+
+    if (!name || !elements || !base){
+
+        $('body').addClass('popup_on error');
+            setTimeout(() => { $('body').removeClass('popup_on error'); }, 1000);
+            return
+
+    }
     
     var elements_length = $('.element');
 
@@ -136,11 +144,15 @@ export function Populate_Variables(ID){
     ID++;
 
     let settings = Gen_Settings(name, base, elements, ID);
+    let render = Gen_Render(name, elements, ID);
+    let shortcode = Gen_Shortcode(name);
+    let action_map = Gen_Action(name);
 
-    console.log(settings);
-
-    // let render = gen_render(name, elements);
-    // let shortcode = gen_shortcode(name);
-    // let action_map = gen_action(name);
+    return {
+        settings: settings,
+        render: render,
+        shortcode: shortcode,
+        action_map: action_map
+    }
 
 }

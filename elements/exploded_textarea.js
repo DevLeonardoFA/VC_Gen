@@ -30,16 +30,21 @@ export function gen_settings(type, name, base){
 
 export function gen_render(type, slug){
     return `
-    <?php if(isset($atts[${type}_${slug}])){ ?>
+    <?php 
+    
+        $${type}_${slug} = isset($atts['${type}_${slug}']) ? explode( " ", $atts['${type}_${slug}']) : [];
+                        
+        if(isset($atts[${type}_${slug}])){ ?>
 
-        <div class="exploded_textarea">
-            <?php foreach($${type}_${slug} as $word){ ?>
+            <div class="exploded_textarea">
+                <?php foreach($${type}_${slug} as $word){ ?>
 
-                <p> <?= $word ?></p>
+                    <p> <?= $word ?></p>
 
-            <?php } ?>
-        </div>
+                <?php } ?>
+            </div>
 
-    <?php } ?>
+        <?php } ?>
+        
     `;
 }

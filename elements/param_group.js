@@ -48,6 +48,9 @@ export function gen_render(type, slug, status){
 
     if(status === "open"){
         to_return = `
+            <?php
+                $${type}_${slug} = isset($atts['${type}_${slug}']) ? vc_param_group_parse_atts($atts['${type}_${slug}']) : [];
+            ?>
             <div class="${type}_${slug}">
                 <?php foreach($${type}_${slug} as $loop_item){ ?>
         `;

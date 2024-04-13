@@ -31,10 +31,14 @@ export function gen_settings(type, name, base){
 
 export function gen_render(type, slug){
     return `
-        <?php if( isset($atts['${type}_${slug}']) ){ ?>
+        <?php
+        
+        $${type}_${slug} = isset($atts['${type}_${slug}']) ? vc_build_link($atts['${type}_${slug}']) : '';
+                 
+        if( isset($atts['${type}_${slug}']) ){ ?>
 
-            <a data-aos-duration="2000" data-aos="fade-up" href="<?= $${type}_${slug}['url']; ?>" target="<?= $${element.type + "_" + element.field_slug}['target']; ?>" class="button">
-                <?= $${element.type + "_" + element.field_slug}['title']; ?>
+            <a data-aos-duration="2000" data-aos="fade-up" href="<?= $${type}_${slug}['url']; ?>" target="<?= $${type}_${slug}['target']; ?>" class="button">
+                <?= $${type}_${slug}['title']; ?>
             </a>
 
         <?php } ?>
