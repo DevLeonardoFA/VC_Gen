@@ -103,6 +103,12 @@
         }
 
         return `<div class="element">
+        
+            <div class="sortbox">
+                <span class="move">
+                    move
+                </span>
+            </div>
             <select name="type" class="select_type" id="type" >
                 ${optionsHTML}
             </select>

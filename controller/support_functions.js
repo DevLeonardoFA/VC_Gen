@@ -156,3 +156,9 @@ export function Populate_Variables(ID){
     }
 
 }
+
+export function DragAndDrop(){
+
+    $("#elements_box").sortable();
+
+}

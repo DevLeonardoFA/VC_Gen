@@ -32,7 +32,7 @@ export function gen_render(type, slug){
     return `
         <?php 
         
-        if($content){ ?>
+        if($content){
             
             $alt = get_post_meta($atts['${type}_${slug}'], '_wp_attachment_image_alt', TRUE);
             $url = wp_get_attachment_image_url( $atts['${type}_${slug}'], 'full' ); ?>
