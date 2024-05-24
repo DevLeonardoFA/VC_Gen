@@ -12,8 +12,8 @@ export default class attach_image{
         return gen_settings(type, name, base);
     }
 
-    gen_render(){
-        return gen_render(this.type, this.slug);
+    gen_render(type, slug){
+        return gen_render(type, slug);
     }
 
 }

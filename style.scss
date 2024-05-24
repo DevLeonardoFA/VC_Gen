@@ -1,3 +1,7 @@
+
+/**
+* Sass code: sass --watch style.scss:style.css
+*/
 $main_font: monospace;
 $text_color: #000000;
 
@@ -21,6 +25,36 @@ $remove_row_bg: #e48585;
 }
 
 body{
+
+    #open_side_bar{
+        position: fixed;
+        top: 10px;
+        left: 10px;
+        z-index: 2;
+        width: auto;
+        display: flex;
+        justify-content: center
+    }
+
+    .side_bar {
+        width: 0%;
+        height: 100%;
+        background-color: #e48585;
+        display: flex;
+        position: fixed;
+        z-index: 1;
+        top: 0;
+        left: 0;
+        box-sizing: border-box;
+        padding: 0;
+        justify-content: center;
+        overflow: hidden;
+        transition: 400ms;
+
+        &.open {
+            width: 25%;
+        }
+    }
 
     .main {
         width: 90%;
@@ -92,7 +126,7 @@ body{
     
                 .element {
                     display: grid;
-                    grid-template-columns: 1fr 1fr 1fr 1fr 60px;
+                    grid-template-columns: 50px 1fr 1fr 1fr 1fr 60px;
                     grid-gap: 5px;
                     margin-top: 3px;
 
@@ -101,6 +135,9 @@ body{
                         align-items: center;
                         justify-content: center;
                         cursor: all-scroll;
+                        max-width: 50px;
+                        height: auto;
+                        aspect-ratio: 1/1;
                     }
 
                     select#type {
@@ -108,7 +145,7 @@ body{
                     }
 
                     input#new_field_name{
-                        grid-column: 3/6;
+                        grid-column: 3/7;
                     }
 
                     .new_option {
