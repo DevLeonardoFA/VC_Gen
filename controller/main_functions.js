@@ -14,8 +14,6 @@ import exploded_textarea from '../elements/exploded_textarea.js';
 
 let obj_attach_image    = new attach_image();
 let obj_attach_images   = new attach_images();
-let obj_checkbox        = new checkbox();
-let obj_dropdown        = new dropdown();
 let obj_loop            = new loop();
 let obj_param_group     = new param_group();
 let obj_vc_link         = new vc_link();
@@ -54,7 +52,6 @@ export default class main_functions{
     
 
 }
-
 
 export function Start(ID){
 
@@ -95,7 +92,6 @@ export function Start(ID){
     
     });
 }
-
 
 // others Functions
 export async function CopyToClipboard(code_generated) {
@@ -145,8 +141,11 @@ export function Gen_Settings(name, base, elements, ID){
 }
 
 export function Gen_Render(name, elements, ID){
+
+    
     
     return `
+
     /**
      * Element Gen 0${ID} Render Function
      * 
@@ -168,34 +167,37 @@ export function Gen_Render(name, elements, ID){
 
                 ${elements.map(element => {
 
+                    var type = element.type;
+                    var slug = element.field_slug;
+
                     switch (element.type) {
 
                         case "param_group_open":
-                            return obj_param_group.gen_render(type, name, base, "open");;
+                            return obj_param_group.gen_render(type, slug, "open");;
 
                         case "param_group_close":
-                            return obj_param_group.gen_render(type, name, base, "close");
+                            return obj_param_group.gen_render(type, slug, "close");
 
                         case "exploded_textarea":
-                            return obj_exploded_textarea.gen_render(type, name, base);
+                            return obj_exploded_textarea.gen_render(type, slug,);
 
                         case "vc_link":
-                            return obj_vc_link.gen_render(type, name, base);
+                            return obj_vc_link.gen_render(type, slug,);
 
                         case "attach_image":
-                            return obj_attach_image.gen_render(type, name, base);
+                            return obj_attach_image.gen_render(type, slug,);
 
                         case "attach_images":
-                            return obj_attach_images.gen_render(type, name, base);
+                            return obj_attach_images.gen_render(type, slug,);
 
                         case "loop":
-                            return obj_loop.gen_render(type, name, base);
+                            return obj_loop.gen_render(type, slug,);
 
                         case "textarea_html":
-                            return obj_textarea_html.gen_render(type, name, base);
+                            return obj_textarea_html.gen_render(type, slug,);
                         
                         default:
-                            return obj_default_field.gen_render(type, name, base);
+                            return obj_default_field.gen_render(type, slug,);
 
                     }
                 }).join("")}

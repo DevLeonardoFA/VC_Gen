@@ -91,6 +91,11 @@
 
     });
 
+    $('#open_side_bar').on('click', function(e) {
+        
+        $('.side_bar').toggleClass('open');
+
+    });
 
 
     //create obj
@@ -106,7 +111,7 @@
         
             <div class="sortbox">
                 <span class="move">
-                    move
+                    <img src="./images/move-selector.png" alt="move">
                 </span>
             </div>
             <select name="type" class="select_type" id="type" >

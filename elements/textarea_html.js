@@ -13,17 +13,13 @@ export default class textarea_html{
         return gen_settings(type, name, base);
     }
 
-    gen_render(){
-        return gen_render(this.type, this.slug);
+    gen_render(type, slug){
+        return gen_render(type, slug);
     }
 
 }
 
 export function gen_settings(type, name, base){
-
-    console.log(base);
-    console.log(base.toUpperCase());
-
     return `
         [
             "type" => "${type}",
