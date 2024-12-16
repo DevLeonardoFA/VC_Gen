@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+
+    <!-- https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'">
+    <script src="./node_modules/jquery/dist/jquery.min.js"></script>
+    <script src="./node_modules/jquery-ui/dist/jquery-ui.min.js"></script>
+
+    <title>VC Gen</title>
+    
+    <link rel="stylesheet" href="style.css">
+
+
+
+  </head>
+  <body>
+
+    <div class="main">
+
+        <button id="open_side_bar">
+            open
+        </button>
+
+        <div class="side_bar">
+
+            <h2>Templates</h2>
+
+        </div>
+
+        <div class="main">
+            <h1>Visual Composer Gen</h1>
+    
+            <form id="form_gen">
+
+                <label for="name">Name</label>
+                <input type="text" id="name" name="name">
+
+                <label for="base">Base</label>
+                <input type="text" id="base" name="base">
+
+                <label for="image">Image</label>
+                <input type="text" id="image" name="image">
+
+                <div id="elements">
+
+                    <div class="row elements">
+                        
+                        <div class="top_sec">
+                            <h2>Fields</h2>
+                            <span id="add_row" class="btn_top">+</span>
+                            <span id="remove" class="btn_top remove">-</span>
+                        </div>
+
+                        <div id="elements_box">
+
+                            
+                            <div class="element">
+                                <div class="sortbox">
+                                    <span class="move">
+                                        <img src="./images/move-selector.png" alt="move">
+                                    </span>
+                                </div>
+                                <select name="type" class="select_type" id="type" >
+
+                                    <option value="textarea_html">textarea_html</option>
+
+                                    <option value="textfield">textfield</option>
+                                    <option value="textarea">textarea</option>
+                                    <option value="colorpicker">colorpicker</option>
+                                    <option value="exploded_textarea">exploded_textarea</option>
+                                    <option value="textarea_raw_html">textarea_raw_html</option>
+
+                                    <option value="attach_image">attach_image</option>
+                                    <option value="attach_images">attach_images</option>
+
+                                    <option value="posttypes">posttypes</option>
+                                    <option value="widgetised_sidebars">widgetised_sidebars</option>
+                                    <option value="vc_link">vc_link</option>
+                                    
+                                    <option value="checkbox">checkbox</option>
+                                    <option value="dropdown">dropdown</option>
+                                    <option value="loop">loop</option>
+                                    <option value="param_group_open">param_group_open</option>
+                                    <option value="param_group_close">param_group_close</option>
+                                    
+                                </select>
+                                <input type="text" name="new_field_name" id="new_field_name" placeholder="Field Name">
+                                <input type="checkbox" name="admin_label" id="admin_label" >
+                            </div>
+
+
+                        </div>
+                    </div>
+
+                </div>
+                
+                <div class="gen_btn_group">
+                    <button type="submit" class="btn_gen" id="gen_settings">Generate Settings</button>
+                    <button type="submit" class="btn_gen" id="gen_renders">Generate Render</button>
+                    <button type="submit" class="btn_gen" id="gen_shortcode">Generate Shortcode</button>
+                    <button type="submit" class="btn_gen" id="gen_action">Generate Action</button>
+                </div>
+
+                <div class="save_like_templte">
+                    <button type="submit" class="btn_gen" id="save_like_template">Save Template</button>
+                </div>
+
+            </form>
+
+            <div class="popup">
+                <span class="ok">Text copied to clipboard!</span>
+                <span class="error">You must set a Name, Base and Elements first</span>
+            </div>
+        </div>
+
+        
+
+    </div>
+
+    
+
+    <script type="module" src="gen.js"></script>
+    <script src="add_element.js"></script>
+
+  </body>
+</html>
